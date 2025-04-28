@@ -1,5 +1,6 @@
 import pandas as pd 
 import matplotlib.pyplot as plt
+from scipy.stats import skew
 
 # path to employees.csv file
 file_path = 'employees.csv'
@@ -61,12 +62,15 @@ print(f"Records with phone numbers containing at least than 10 digits: {num_inva
 # each employee has a manager who is a known employee
 # If reports_to is filled out, it must match an existing eid in the dataset.
 # Exclude rows where reports_to is blank or null
-reports_to_null = df['reports_to'].notnull() & (df['reports_to'] != '')
-# set of valid EIDs
-eids = set(df['eid'].astype(str))
-# ~ flips the result, so True where the reports_to value does not match any known eid.
-managers = ~df.loc[reports_to_null, 'reports_to'].isin(eids)
-num_invalid_managers = managers.sum()
+df = pd.read_csv('employees.csv', dtype=str)  # Make sure all columns are strings
+# reports_to must not be null and must not be empty
+reports_to_valid = df['reports_to'].notnull() & (df['reports_to'].str.strip() != '')
+# set of all valid employee IDs
+eids = set(df['eid'])
+# Check if reports_to points to a known employee ID
+managers_invalid = ~df.loc[reports_to_valid, 'reports_to'].isin(eids)
+# Count invalid manager references
+num_invalid_managers = managers_invalid.sum()
 print(f"Records with unknown managers: {num_invalid_managers}")
 
 
@@ -116,7 +120,6 @@ plt.tight_layout()
 
 plt.show()
 
-
 #median salary should be between $50,000-$150,000
 median_salary = salaries.median()
 min_expected = 50000
@@ -129,4 +132,3 @@ if valid_median:
     print("Median salary is within the expected range.")
 else:
     print("Median salary is outside the expected range.")
-
