@@ -20,7 +20,7 @@ num_records = len(df)
 print(f"\nNumber of breadcrumb records: {num_records}\n")
 
 
-# Convert OPD_DATE and ACT_TIME into a proper TIMESTAMP
+#  OPD_DATE + ACT_TIME -> TIMESTAMP
 df["OPD_DATE"] = pd.to_datetime(df["OPD_DATE"].str[:9], format="%d%b%Y")
 df["TIMESTAMP"] = df["OPD_DATE"] + pd.to_timedelta(df["ACT_TIME"], unit="s")
 

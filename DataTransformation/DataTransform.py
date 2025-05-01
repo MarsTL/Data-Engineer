@@ -51,7 +51,7 @@ df_filtered["TIMESTAMP"] = pd.to_datetime(df_filtered["OPD_DATE"], format="%d%b%
 print(df_filtered.head())
 
 # CONTINUE  
-# STEP 3a: Create TIMESTAMP column
+# TIMESTAMP column
 print("testttt")
 def make_timestamp(row):
     date_str = row["OPD_DATE"].split(":")[0]
