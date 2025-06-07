@@ -91,6 +91,7 @@ for _ in range(10000):
     })
 
 emp_df = pd.DataFrame(employees)
+emp_df.to_csv("emp_df.csv", index=False)
 emp_df.head(10)
 
 print("\nemp_df:")
@@ -107,14 +108,92 @@ for _, row in emp_df.head(10).iterrows():
 
 print("\nTotal Payroll:", emp_df["salary"].sum())
 
+
+def add_value_labels(ax):
+    for bar in ax.patches:
+        height = bar.get_height()
+        ax.annotate(f'{int(height)}',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3),
+                    textcoords="offset points",
+                    ha='center', va='bottom', fontsize=9)
+
+
+
 #3a. bar chart displaying counts of each CountryOfBirth
-country_counts = emp_df["CountryOfBirth"].value_counts().sort_values(ascending=False)
-plt.figure(figsize=(8, 5))
-country_counts.plot(kind='bar', color='blue')
-plt.title("counts of each CountryOfBirth")
-plt.xlabel("Country")
-plt.ylabel("Count")
+fig, ax = plt.subplots(figsize=(8, 5))
+emp_df["CountryOfBirth"].value_counts().sort_values(ascending=False).plot(kind='bar', color='skyblue', ax=ax)
+ax.set_title("counts of each CountryOfBirth")
+ax.set_xlabel("Country")
+ax.set_ylabel("Count")
+add_value_labels(ax)
 plt.tight_layout()
 plt.show()
 
-#3b.bar chart displaying counts of each CountryOfBirth
+#3b.bar chart displaying counts for each Department
+fig, ax = plt.subplots(figsize=(10, 5))
+emp_df["department"].value_counts().sort_values(ascending=False).plot(kind='bar', color='lightgreen', ax=ax)
+ax.set_title("counts for each Department")
+ax.set_xlabel("Department")
+ax.set_ylabel("Count")
+add_value_labels(ax)
+plt.tight_layout()
+plt.show()
+
+
+# 3C 
+# # Step 3C: Extract day of week from hiredate
+emp_df["hire_dayofweek"] = pd.to_datetime(emp_df["hiredate"]).dt.day_name()
+ordered_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+hire_counts = emp_df["hire_dayofweek"].value_counts().reindex(ordered_days)
+fig, ax = plt.subplots(figsize=(10, 5))
+hire_counts.plot(kind='bar', color='salmon', ax=ax)
+ax.set_title("Employees Hired by Day of the Week")
+ax.set_xlabel("Day of the Week")
+ax.set_ylabel("Number of Hires")
+add_value_labels(ax)
+plt.tight_layout()
+plt.show()
+
+
+#3D KDE
+plt.figure(figsize=(10, 5))
+sns.kdeplot(emp_df["salary"], fill=True, color='purple')
+plt.title("KDE Plot of Employee Salaries")
+plt.xlabel("Salary")
+plt.ylabel("Density")
+plt.tight_layout()
+plt.show()
+
+#3E
+birth_years = pd.to_datetime(emp_df["birthdate"]).dt.year
+birth_year_counts = birth_years.value_counts().sort_index()
+
+# Plot
+plt.figure(figsize=(10, 5))
+birth_year_counts.plot(kind='line', marker='o', color='teal')
+plt.title("Number of Employees by Birth Year")
+plt.xlabel("Birth Year")
+plt.ylabel("Employees")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+#3F
+plt.figure(figsize=(12, 6))
+for dept in emp_df["department"].unique():
+    sns.kdeplot(
+        data=emp_df[emp_df["department"] == dept],
+        x="salary",
+        label=dept,
+        fill=True,
+        alpha=0.3
+    )
+plt.title("Salary Distribution by Department")
+plt.xlabel("Salary")
+plt.ylabel("Density")
+plt.legend(title="Department", bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.tight_layout()
+plt.show()
+
+
